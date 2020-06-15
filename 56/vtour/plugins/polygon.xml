@@ -1,0 +1,182 @@
+<krpano onstart="hotspotNum();">
+
+	<!--<plugin name="hotspot_pos_info" keep="true"
+	url="%SWFPATH%/plugins/textfield.swf"
+	html="hotspots"
+	background="true" backgroundcolor="0x2D3E50" backgroundalpha="0.7"
+	css="font-family:Courier; color:#FFFFFF; font-size:12px;"
+	padding="8"
+	align="lefttop" x="10" y="10"
+	width="110"
+	enabled="false"
+	alpha="1"
+	/>-->
+	<action name="print_hotspot_pos">
+		<![CDATA[
+		copy(print_ath, toh);
+		copy(print_atv, tov);
+		roundval(print_ath, 3);
+		roundval(print_atv, 3);
+		calc(plugin[hotspot_pos_info].html, 'hotspot[br]
+		name="' + hsname + '"[br]
+		point="' + pid + '"[br]
+		ath="' + print_ath + '"[br]
+		atv="' + print_atv + '"[br]
+		');
+		]]>
+	</action>
+	<action name="hotspotNum">copy(hs, hotspot.count);
+		if(hs == null, set(hs,0););
+
+		copy(imgNum, hotspot.count);
+		if(imgNum == null, set(imgNum,0););</action>
+	<action name="startdraw">if(drawing == true,set(drawing, false);
+		saveNameHs(get(hsname));
+		);
+		trace(%0); inc(hs);
+		set(drawing, true);
+		txtadd(hsname, 'hs', get(hs));
+		txtadd(name, 'val', get(hs));
+		trace(get(hsname));
+		addhotspot(get(hsname));
+		addhotspot(get(name));
+
+		set(hotspot[get(hsname)].enabled, false);
+		set(pid, 0);</action>
+	<action name="stopdraw">trace(%0);
+		set(drawing, false);
+		saveNameHs(get(hsname));</action>
+	<action name="addpoint">
+		screentosphere(mouse.x, mouse.y, toh, tov);
+		set(hotspot[get(hsname)].point[get(pid)].ath, get(toh));
+		set(hotspot[get(hsname)].point[get(pid)].atv, get(tov));
+		txtadd(point_P,'point ','ath="',get(toh),'" atv="',get(tov),'"/');
+		trace(point_P);
+		updatescreen(); mousemove(); inc(pid);
+		txtadd(actionHSall2,get(point_P));
+		Sohranity_point(get(point_P));
+
+		<!--添加图片锚点 -->
+		inc(imgNum);
+		txtadd(imghot, 'hot', get(imgNum));
+		addhotspot(get(imghot));
+		set(hotspot[get(imghot)].enabled, false);
+		set(hotspot[get(imghot)].url,drop.png);
+		set(hotspot[get(imghot)].ath,get(toh));
+		set(hotspot[get(imghot)].atv,get(tov));
+		set(hotspot[get(imghot)].scale,0.7);
+		set(hotspot[get(imghot)].zoom,true);
+
+		js(getXY(get(pid),get(toh), get(tov),get(xml.scene)));
+		jsget(date, point(point));
+
+		<!--添加显示距离 -->
+		if(pid == 2,
+		set(hotspot[get(name)].type,text);
+		set(hotspot[get(name)].html,get(date));
+		set(hotspot[get(name)].ath,get(calc(toh+5)));
+		set(hotspot[get(name)].atv,get(tov));
+		set(hotspot[get(name)].edge,center);
+		set(hotspot[get(name)].css,'color:#000000');
+		<!--set(hotspot[get(name)].zorder,1);-->
+		set(hotspot[get(name)].scale,1);
+		set(hotspot[get(name)].zoom,true);
+		stopdraw());
+
+	</action>
+	<action name="mousemove">screentosphere(mouse.x, mouse.y, toh, tov);
+		set(hotspot[get(hsname)].point[get(pid)].ath, get(toh));
+		set(hotspot[get(hsname)].point[get(pid)].atv, get(tov));
+		updatescreen();
+		if(drawing == true, delayedcall(0.0, mousemove()));
+		print_hotspot_pos();</action>
+	<action name="remPoint">removehotspot(get(hsname));
+		dec(hs);
+		txtadd(hsname, 'hs', get(hs));</action>
+	<events
+	onkeydown="if(keycode == 32, startdraw()); if(keycode == 81, stopdraw()); if(keycode == 83, saveVseHs(););
+	if(keycode == 68, remPoint());"
+	onclick="if(drawing == true, addpoint());" />
+	<action name="Sohranity_point">set(data[point_c].content, calc:'%1');
+		set(athatv, calc:data[open_sk].content + data[point_c].content +  data[close_sk].content);
+		txtadd(hs_p,get(athatv));
+		Sohranity_nastr_v_action(get(hs_p));</action>
+	<action name="point_coord">set(athatv, calc:data[open_sk].content + data[point_c].content +  data[close_sk].content);
+		txtadd(hs_p,get(athatv));
+		Sohranity_nastr_v_action(get(hs_p));</action>
+	<action name="Sohranity_nastr_v_action">set(data[arhiv1].content, calc:'%1');</action>
+	<action name="saveNameHs">set(data[nameHs].content, calc:'%1');
+		set(HS_1, calc:data[hotspot name].content + data[nameHs].content + data[hotspot name2].content + data[arhiv1].content + data[hotspot name3].content);
+		txtadd(vseHS,get(HS_1));
+		delete(hs_p);
+		vseHSdata(get(vseHS));</action>
+	<action name="vseHSdata">set(data[setVseHS].content, calc:'%1');</action>
+	<!--<action name="saveVseHs">
+	set(hs_dat, calc:data[krpano_1].content + data[setVseHS].content + data[krpano_2].content);
+	saveTxtFromJs(get(hs_dat));
+	</action>-->
+	<data name="hotspot name">
+		<![CDATA[ <hotspot name="]]>
+	</data>
+	<data name="hotspot name2">
+		<![CDATA[" style="hs">
+		]]>
+	</data>
+	<data name="hotspot name3">
+		<![CDATA[ </hotspot>
+
+		]]>
+	</data>
+	<data name="krpano_1">
+		<![CDATA[
+		<krpano>
+
+		]]>
+	</data>
+	<data name="open_sk">
+		<![CDATA[ <]]>
+	</data>
+	<data name="close_sk">
+		<![CDATA[>
+		]]>
+	</data>
+	<data name="krpano_2">
+		<![CDATA[</krpano>]]>
+	</data>
+	<action name="saveTxtFromJs" type="Javascript">
+		<![CDATA[
+		var textToWrite = args[1];
+
+		//var textToWrite = document.getElementById("inputTextToSave").value;
+		var textFileAsBlob = new Blob([textToWrite], {type:'text/xml;charset=utf-8;'});
+		var fileNameToSaveAs = "save_poligon.xml"
+
+		var downloadLink = document.createElement("a");
+		downloadLink.download = fileNameToSaveAs;
+		downloadLink.innerHTML = "Hidden link";
+		if (window.webkitURL != null)
+		{
+		// Chrome allows the link to be clicked
+		// without actually adding it to the DOM.
+		downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+		}
+		else
+		{
+		// Firefox requires the link to be added to the DOM
+		// before it can be clicked.
+		downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+		downloadLink.onclick = destroyClickedElement;
+		downloadLink.style.display = "none";
+		document.body.appendChild(downloadLink);
+		}
+
+		downloadLink.click();
+
+		function destroyClickedElement(event)
+		{
+		document.body.removeChild(event.target);
+		}
+		]]>
+	</action>
+
+</krpano>

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8">
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>十三陵3D展示</title>
+  <script type="text/javascript" src="https://cesium.com/downloads/cesiumjs/releases/1.69/Build/Cesium/Cesium.js"></script>
+  
+  <link href="Source/bucket.css" rel="stylesheet">
+  <script src="Source/header.js"></script>
+  <script type="text/javascript">
+        if(typeof require === "function") {
+            require.config({
+                baseUrl : 'Source',
+                waitSeconds : 120
+            });
+        }
+		</script>
+</head>
+
+<body class="sandcastle-loading" data-sandcastle-bucket="bucket-requirejs.html">
+<div id="cesiumContainer" class="fullSize"></div>
+
+<script >
+
+function startup(Cesium) {
+	//Sandcastle_Begin
+	var worldTerrain = Cesium.createWorldTerrain({
+    requestWaterMask: true,
+    requestVertexNormals: true
+	});
+	 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIxYWQwZTY0Zi1iNDZmLTRlOWUtODhiNi1iZTIyZGJjZmEyOWUiLCJpZCI6MjczNDksInNjb3BlcyI6WyJhc2wiLCJhc3IiLCJhc3ciLCJnYyIsInByIl0sImlhdCI6MTU4OTM2MDYyNH0.b7fH0x7Hpj-rEvO2SxYR_Dszc-sakv6_aE-y_GBo6Pg';
+	var viewer = new Cesium.Viewer('cesiumContainer', {
+        timeline : false ,	animation : false ,	geocoder:false , terrainProvider: worldTerrain
+	});
+	
+	var target = new Cesium.Cartesian3.fromDegrees(116.257253,40.288222);
+	var heading = Cesium.Math.toRadians(145.0);
+	var pitch = Cesium.Math.toRadians(-30.0);
+	var range = 1000.0;
+	viewer.camera.lookAt(target, new Cesium.HeadingPitchRange(heading, pitch, range));
+	//viewer.camera.lookAt(target, offset);
+	//viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+	
+	var pinBuilder = new Cesium.PinBuilder();
+	var tileset = viewer.scene.primitives.add(
+	    new Cesium.Cesium3DTileset({
+	        url: Cesium.IonResource.fromAssetId(99306)
+	    })
+	);
+	viewer.zoomTo(tileset);
+	
+	
+	
+	
+	point1();
+	//segment start***********************************************
+	function point1() {
+		var terrainSamplePositions;
+		var iframe = document.getElementsByClassName('cesium-infoBox-iframe')[0];
+		iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
+		terrainSamplePositions = [];
+		var position = new Cesium.Cartographic(Cesium.Math.toRadians(116.257253), Cesium.Math.toRadians(40.288222));
+		terrainSamplePositions.push(position);
+
+		Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 11, terrainSamplePositions), sampleTerrainSuccess);
+
+		function sampleTerrainSuccess() {
+			var ellipsoid = Cesium.Ellipsoid.WGS84;
+			var position = terrainSamplePositions[0];
+			viewer.entities.add({
+				name : "永陵",
+				position : ellipsoid.cartographicToCartesian(position),
+				billboard : {
+					verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+					image : pinBuilder.fromText("永陵",Cesium.Color.ROYALBLUE, 72).toDataURL(),
+				},
+				description  : '<h1>永陵</h1>\
+					<p><img src="Source/Images/yongling-s.jpg" width="150" height="100"></p>\
+					<p><a href="https://baike.baidu.com/item/明永陵/879986?fr=aladdin" target="new">明永陵详解</a></p>\
+					<p><a href="http://222.128.2.151:48080/smarteye/panorama/52/vtourPreview/tour.html" target="_blank">全景图</a></p>\
+					<p><a href="http://www.jxgd.info/pana-test.html" target="_blank">全景</a></p>'
+					
+			});
+		} 
+	}
+
+/*
+	function point2() {
+		var terrainSamplePositions;
+		terrainSamplePositions = [];
+		var position = new Cesium.Cartographic(Cesium.Math.toRadians(115.893031), Cesium.Math.toRadians(39.94705));
+		terrainSamplePositions.push(position);
+
+		Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 11, terrainSamplePositions), sampleTerrainSuccess);
+
+		function sampleTerrainSuccess() {
+			var ellipsoid = Cesium.Ellipsoid.WGS84;
+			var position = terrainSamplePositions[0];
+
+			viewer.entities.add({
+				name : "福龙桥",
+				position : ellipsoid.cartographicToCartesian(position),
+				billboard : {
+					verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+					image : pinBuilder.fromText("福龙桥",Cesium.Color.ROYALBLUE, 72).toDataURL(),
+				},
+				description  : '<h1>福龙桥</h1> \
+					<p><a href="https://pannellum.org" target="new"> <img src="/pictures/small/shilibaqiao/fulongqiao.JPG" width="150" height="100"> </a></p>\
+					<p><a href="http://www.jxgd.info/bbs/forum.php?mod=viewthread&tid=2731&extra=page%3D1" target="new">福龙桥详解</a></p>'   
+
+			});
+		} 
+	}
+
+	function point3() {
+		var terrainSamplePositions;
+		terrainSamplePositions = [];
+		var position = new Cesium.Cartographic(Cesium.Math.toRadians(115.8801), Cesium.Math.toRadians(39.944348));
+		terrainSamplePositions.push(position);
+
+		Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 11, terrainSamplePositions), sampleTerrainSuccess);
+
+		function sampleTerrainSuccess() {
+			var ellipsoid = Cesium.Ellipsoid.WGS84;
+			var position = terrainSamplePositions[0];
+
+			viewer.entities.add({
+				name : "鳌鱼桥",
+				position : ellipsoid.cartographicToCartesian(position),
+				billboard : {
+					verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+					image : pinBuilder.fromText("鳌鱼桥",Cesium.Color.ROYALBLUE, 72).toDataURL(),
+				},
+				description  : '<h1>鳌鱼桥</h1>  \
+					<p><img src="/pictures/small/shilibaqiao/aoyuqiao.jpg" width="150" height="100" /></p>\
+					<p><a href="http://www.jxgd.info/bbs/forum.php?mod=viewthread&tid=2729&extra=" target="new">鳌鱼桥介绍</a></p>'   
+			});
+		} 
+	}
+
+	function point4() {
+		var terrainSamplePositions;
+		terrainSamplePositions = [];
+		var position = new Cesium.Cartographic(Cesium.Math.toRadians(115.872167), Cesium.Math.toRadians(39.941385));
+		terrainSamplePositions.push(position);
+
+		Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 11, terrainSamplePositions), sampleTerrainSuccess);
+
+		function sampleTerrainSuccess() {
+			var ellipsoid = Cesium.Ellipsoid.WGS84;
+			var position = terrainSamplePositions[0];
+
+			viewer.entities.add({
+				name : "卧虎桥",
+				position : ellipsoid.cartographicToCartesian(position),
+				billboard : {
+					verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+					image : pinBuilder.fromText("卧虎桥",Cesium.Color.ROYALBLUE, 72).toDataURL(),
+				},
+				description  : '<h1>卧虎桥</h1> \
+					<p><img src="/pictures/small/shilibaqiao/wohuqiao.JPG" width="150" height="100" /></p>\
+					<p><a href="http://www.jxgd.info/bbs/forum.php?mod=viewthread&tid=2736&extra=" target="new">卧虎桥详解</a></p>'   
+			});
+		} 
+	}
+
+	function point5() {
+		var terrainSamplePositions;
+		terrainSamplePositions = [];
+		var position = new Cesium.Cartographic(Cesium.Math.toRadians(115.861345), Cesium.Math.toRadians(39.937407));
+		terrainSamplePositions.push(position);
+
+		Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 11, terrainSamplePositions), sampleTerrainSuccess);
+
+		function sampleTerrainSuccess() {
+			var ellipsoid = Cesium.Ellipsoid.WGS84;
+			var position = terrainSamplePositions[0];
+
+			viewer.entities.add({
+				name : "庄户桥",
+				position : ellipsoid.cartographicToCartesian(position),
+				billboard : {
+					verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+					image : pinBuilder.fromText("庄户桥",Cesium.Color.ROYALBLUE, 72).toDataURL(),
+				},
+				description  : '<h1>庄户桥</h1> \
+						<p><img src="/pictures/small/shilibaqiao/zhuanghuqiao.jpg" width="150" height="100" /></p>\
+					'
+					//<p><a href="/gudaozhongzhen/sanjiadian.html" target="new">古道重镇三家店</a></p>'   
+			});
+		} 
+	}
+
+	function point6() {
+		var terrainSamplePositions;
+		terrainSamplePositions = [];
+		var position = new Cesium.Cartographic(Cesium.Math.toRadians(115.854742), Cesium.Math.toRadians(39.936196));
+		terrainSamplePositions.push(position);
+
+		Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 11, terrainSamplePositions), sampleTerrainSuccess);
+
+		function sampleTerrainSuccess() {
+			var ellipsoid = Cesium.Ellipsoid.WGS84;
+			var position = terrainSamplePositions[0];
+
+			viewer.entities.add({
+				name : "千胜桥",
+				position : ellipsoid.cartographicToCartesian(position),
+				billboard : {
+					verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+					image : pinBuilder.fromText("千胜桥",Cesium.Color.ROYALBLUE, 72).toDataURL(),
+				},
+				description  : '<h1>千胜桥</h1> \
+					<p><img src="/pictures/small/shilibaqiao/qianshengqiao.JPG" width="150" height="100" /></p>\
+					<p><a href="http://www.jxgd.info/bbs/forum.php?mod=viewthread&tid=2737&extra=" target="new">千胜桥详解</a></p>'   
+			});
+		} 
+	}
+
+	function point7() {
+		var terrainSamplePositions;
+		terrainSamplePositions = [];
+		var position = new Cesium.Cartographic(Cesium.Math.toRadians(115.925027), Cesium.Math.toRadians(39.952564));
+		terrainSamplePositions.push(position);
+
+		Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 11, terrainSamplePositions), sampleTerrainSuccess);
+
+		function sampleTerrainSuccess() {
+			var ellipsoid = Cesium.Ellipsoid.WGS84;
+			var position = terrainSamplePositions[0];
+
+			viewer.entities.add({
+				name : "玉成桥",
+				position : ellipsoid.cartographicToCartesian(position),
+				billboard : {
+					verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+					image : pinBuilder.fromText("玉成桥",Cesium.Color.ROYALBLUE, 72).toDataURL(),
+				},
+				description  : '<h1>玉成桥</h1> \
+					<p><img src="/pictures/small/shilibaqiao/yuchengqiao.jpg" width="150" height="100" /></p>\
+					<p><a href="http://www.jxgd.info/bbs/forum.php?mod=viewthread&tid=2734&extra=" target="new">玉成桥详解</a></p>'   
+			});
+		} 
+	}
+
+	function point8() {
+		var terrainSamplePositions;
+		terrainSamplePositions = [];
+		var position = new Cesium.Cartographic(Cesium.Math.toRadians(115.911145), Cesium.Math.toRadians(39.952608));
+		terrainSamplePositions.push(position);
+
+		Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 11, terrainSamplePositions), sampleTerrainSuccess);
+
+		function sampleTerrainSuccess() {
+			var ellipsoid = Cesium.Ellipsoid.WGS84;
+			var position = terrainSamplePositions[0];
+
+			viewer.entities.add({
+				name : "黑虎桥",
+				position : ellipsoid.cartographicToCartesian(position),
+				billboard : {
+					verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+					image : pinBuilder.fromText("黑虎桥",Cesium.Color.ROYALBLUE, 72).toDataURL(),
+				},
+				description  : '<h1>黑虎桥</h1> \
+					<p><img src="/pictures/small/shilibaqiao/heihuqiao.jpg" width="150" height="100" /></p>\
+					<p><a href="http://www.jxgd.info/bbs/forum.php?mod=viewthread&tid=2728&extra=page%3D1" target="new">木城涧黑虎桥摩崖石刻</a></p>'   
+			});
+		} 
+	}
+
+
+
+
+	function point9() {
+		var terrainSamplePositions;
+		terrainSamplePositions = [];
+		var position = new Cesium.Cartographic(Cesium.Math.toRadians(115.891265), Cesium.Math.toRadians(39.946234));
+		terrainSamplePositions.push(position);
+
+		Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 11, terrainSamplePositions), sampleTerrainSuccess);
+
+		function sampleTerrainSuccess() {
+			var ellipsoid = Cesium.Ellipsoid.WGS84;
+			var position = terrainSamplePositions[0];
+
+			viewer.entities.add({
+				name : "过街楼",
+				position : ellipsoid.cartographicToCartesian(position),
+				billboard : {
+					verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+					image : pinBuilder.fromText("过街楼",Cesium.Color.LIGHTGREEN, 72).toDataURL(),
+				},
+				description  : '<h1>过街楼</h1> \
+					<p><img src="/pictures/small/shilibaqiao/guojielou.JPG" width="150" height="100" /></p>\
+					'
+					//<p><a href="/gudaozhongzhen/yanhecheng.html" target="new">古道重镇沿河城</a></p>'   
+			});
+		} 
+	}
+
+	function point10() {
+		var terrainSamplePositions;
+		terrainSamplePositions = [];
+		var position = new Cesium.Cartographic(Cesium.Math.toRadians(115.844238), Cesium.Math.toRadians(39.931989));
+		terrainSamplePositions.push(position);
+
+		Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 11, terrainSamplePositions), sampleTerrainSuccess);
+
+		function sampleTerrainSuccess() {
+			var ellipsoid = Cesium.Ellipsoid.WGS84;
+			var position = terrainSamplePositions[0];
+
+			viewer.entities.add({
+				name : "茶棚",
+				position : ellipsoid.cartographicToCartesian(position),
+				billboard : {
+					verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+					image : pinBuilder.fromText("茶棚",Cesium.Color.LIGHTGREEN, 72).toDataURL(),
+				},
+				description  : '<h1>茶棚</h1>'
+					//<p><img src="/pictures/small/dahanlingguan.jpg" width="150" height="118" /></p>\
+					//<p><a href="/gudaozhongzhen/dahanlingguan.html" target="new">古道重镇大寒岭关</a></p>'   
+			});
+		} 
+	}
+
+	function point11() {
+		var terrainSamplePositions;
+		terrainSamplePositions = [];
+		var position = new Cesium.Cartographic(Cesium.Math.toRadians(115.814111), Cesium.Math.toRadians(39.939369));
+		terrainSamplePositions.push(position);
+
+		Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 11, terrainSamplePositions), sampleTerrainSuccess);
+
+		function sampleTerrainSuccess() {
+			var ellipsoid = Cesium.Ellipsoid.WGS84;
+			var position = terrainSamplePositions[0];
+
+			viewer.entities.add({
+				name : "大寒岭",
+				position : ellipsoid.cartographicToCartesian(position),
+				billboard : {
+					verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+					image : pinBuilder.fromText("大寒岭",Cesium.Color.LIGHTGREEN, 72).toDataURL(),
+				},
+				description  : '<h1>大寒岭</h1>\
+					<p><img src="/pictures/small/dahanlingguan.jpg" width="150" height="118" /></p>\
+					<p><a href="/gudaozhongzhen/dahanlingguan.html" target="new">古道重镇大寒岭关</a></p>'   
+			});
+		} 
+	}
+
+	function point12() {
+		var terrainSamplePositions;
+		terrainSamplePositions = [];
+		var position = new Cesium.Cartographic(Cesium.Math.toRadians(115.823858), Cesium.Math.toRadians(39.925719));
+		terrainSamplePositions.push(position);
+
+		Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 11, terrainSamplePositions), sampleTerrainSuccess);
+
+		function sampleTerrainSuccess() {
+			var ellipsoid = Cesium.Ellipsoid.WGS84;
+			var position = terrainSamplePositions[0];
+
+			viewer.entities.add({
+				name : "千军台",
+				position : ellipsoid.cartographicToCartesian(position),
+				billboard : {
+					verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+					image : pinBuilder.fromText("千军台",Cesium.Color.LIGHTGREEN, 72).toDataURL(),
+				},
+				description  : '<h1>千军台</h1>\
+					<p><img src="/pictures/small/qianjuntai.jpg" width="150" height="112" /></p>\
+					<p><a href="http://baike.baidu.com/view/5932364.htm" target="new">古道重镇千军台</a></p>'   
+			});
+		} 
+	}
+
+	function point13() {
+		var terrainSamplePositions;
+		terrainSamplePositions = [];
+		var position = new Cesium.Cartographic(Cesium.Math.toRadians(115.933872), Cesium.Math.toRadians(39.947264));
+		terrainSamplePositions.push(position);
+
+		Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 11, terrainSamplePositions), sampleTerrainSuccess);
+
+		function sampleTerrainSuccess() {
+			var ellipsoid = Cesium.Ellipsoid.WGS84;
+			var position = terrainSamplePositions[0];
+
+			viewer.entities.add({
+				name : "王平口",
+				position : ellipsoid.cartographicToCartesian(position),
+				billboard : {
+					verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+					image : pinBuilder.fromText("王平口",Cesium.Color.LIGHTGREEN, 72).toDataURL(),
+				},
+				description  : '<h1>王平口关</h1>\
+					<p><img src="/pictures/small/wangpingkouguan.jpg" width="150" height="100" /></p>\
+					<p><a href="/gudaozhongzhen/wangpingkouguan.html" target="new">古道重镇王平口关</a></p>'   
+			});
+		} 
+	}
+*/
+
+	var options = {
+		camera : viewer.scene.camera,
+	    canvas : viewer.scene.canvas
+	};
+	Sandcastle.finishedLoading();
+
+}
+if (typeof Cesium !== 'undefined') {
+    startup(Cesium);
+} else if (typeof require === 'function') {
+    require(['Cesium'], startup);
+}
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,304 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>krpano - 55cm</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge" />
+		<style>
+			@-ms-viewport {
+				width: device-width;
+			}
+			
+			@media only screen and (min-device-width:800px) {
+				html {
+					overflow: hidden;
+				}
+			}
+			
+			html {
+				height: 100%;
+			}
+			
+			body {
+				height: 100%;
+				overflow: hidden;
+				margin: 0;
+				padding: 0;
+				font-family: Arial, Helvetica, sans-serif;
+				font-size: 16px;
+				color: #FFFFFF;
+				background-color: #000000;
+			}
+			
+			svg polygon {
+				stroke: rgb(255, 0, 0);
+				fill: rgba(255, 0, 0, 0.5);
+			}
+			
+			#leftDistance {
+				position: absolute;
+				text-align: center;
+				width: 50px;
+				height: 30px;
+				top: 10px;
+				left: 10px;
+				background: rgba(0, 0, 0, .5);
+				margin-right: 2px;
+				padding: 3px;
+				cursor: pointer;
+				background: url(fanhui.png) no-repeat center;
+				background-size: cover;
+			}
+			
+			.Title {
+				position: absolute;
+				background: #000000;
+				opacity: 0.5;
+				text-align: center;
+				line-height: 50px;
+				left: 50%;
+				margin-left: -100px;
+				width: 200px;
+				height: 50px;
+				font-size: 20px;
+			}
+			
+			.exporimg {
+				display: inline-block;
+				position: absolute;
+				background: #000000;
+				opacity: 0.5;
+				text-align: center;
+				line-height: 30px;
+				top: 10px;
+				left: 100px;
+				width: 80px;
+				height: 30px;
+				font-size: 20px;
+				cursor: pointer;
+			}
+			
+			.bj {
+				position: absolute;
+				left: 100px;
+				top: 10px;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<script src="tour.js"></script>
+		<script type="text/javascript" src="jquery-3.4.1.min.js"></script>
+
+		<div id="viewersDiv" style="position:absolute;  left:0; top:0; width:100%; height:100%;">
+			<div id="krpanoLeftDiv" style="position:absolute; left:0%;  top:0; width:50%; height:100%;"></div>
+			<div id="krpanoRightDiv" style="position:absolute; left:50%; top:0; width:50%; height:100%;"></div>
+			<!-- 显示距离 -->
+			<div id="leftDistance" onclick="goback()">
+
+			</div>
+			<div class="Title">
+				测距
+			</div>
+			<!--<input type="button" value="显示标记线" class="bj" onclick="ShowLine()" />-->
+
+			<!--<input class="exporimg" type="button" value="截图" onclick="takeScreenshot()">-->
+			<!-- 		<div id="rightDistance" style="position: absolute;left: 50%; height: 20px;background: rgba(0,0,0,.5);margin-left: 2px;padding: 3px;display: none;">0</div> -->
+		</div>
+
+		<script>
+			var Url = 'http://222.128.6.209:48080'; //外网
+
+			// embed the krpano viewers
+			embedpano({
+				swf: "tour.swf",
+				html5: "auto",
+				id: "krpanoLeftViewer",
+				target: "krpanoLeftDiv",
+				xml: "tour.xml",
+				vars: {
+					side: "left",
+					cubepathsidepostfix: "-L.tiles"
+				},
+				passQueryParameters: true
+			});
+			embedpano({
+				swf: "tour.swf",
+				html5: "auto",
+				id: "krpanoRightViewer",
+				target: "krpanoRightDiv",
+				xml: "tour.xml",
+				vars: {
+					side: "right",
+					cubepathsidepostfix: "-R.tiles"
+				},
+				passQueryParameters: true
+			});
+
+			// html5 fullscreen api
+			function requestfullscreen() {
+				var div = document.getElementById("viewersDiv");
+				var fs = ["requestFullscreen", "mozRequestFullScreen", "webkitRequestFullscreen", "webkitRequestFullScreen", "msRequestFullscreen"];
+
+				for(var i = 0; i < fs.length; i++) {
+					if(div[fs[i]]) {
+						div[fs[i]]();
+
+						var krpano1 = document.getElementById("krpanoLeftViewer");
+						var krpano2 = document.getElementById("krpanoRightViewer");
+						krpano1.set("contextmenu.item[fs].onclick", "js( exitfullscreen() );");
+						krpano2.set("contextmenu.item[fs].onclick", "js( exitfullscreen() );");
+
+						break;
+					}
+				}
+			}
+
+			function exitfullscreen() {
+				var fs = ["exitFullscreen", "mozCancelFullScreen", "webkitCancelFullScreen", "webkitExitFullscreen", "msExitFullscreen"];
+
+				for(var i = 0; i < fs.length; i++) {
+					if(document[fs[i]]) {
+						document[fs[i]]();
+
+						var krpano1 = document.getElementById("krpanoLeftViewer");
+						var krpano2 = document.getElementById("krpanoRightViewer");
+						krpano1.set("contextmenu.item[fs].onclick", "js( requestfullscreen() );");
+						krpano2.set("contextmenu.item[fs].onclick", "js( requestfullscreen() );");
+
+						break;
+					}
+				}
+			}
+
+			// sync viewer movement
+			function sync_1to2() {
+				var krpano1 = document.getElementById("krpanoLeftViewer");
+				var krpano2 = document.getElementById("krpanoRightViewer");
+
+				krpano2.set("syncother", false);
+				krpano2.set("view.hlookat", krpano1.get("view.hlookat"));
+				krpano2.set("view.vlookat", krpano1.get("view.vlookat"));
+				krpano2.set("view.fov", krpano1.get("view.fov"));
+			}
+
+			function sync_2to1() {
+				var krpano1 = document.getElementById("krpanoLeftViewer");
+				var krpano2 = document.getElementById("krpanoRightViewer");
+
+				krpano1.set("syncother", false);
+				krpano1.set("view.hlookat", krpano2.get("view.hlookat"));
+				krpano1.set("view.vlookat", krpano2.get("view.vlookat"));
+				krpano1.set("view.fov", krpano2.get("view.fov"));
+			}
+
+			//			function ShowLine() {
+			//				$('svg').toggle();
+			//			}
+
+			function goback() {
+				window.history.back(-1);
+			}
+
+			function takeScreenshot() {
+				html2canvas(document.getElementById('viewersDiv'), {
+					onrendered: function(canvas) {
+						document.getElementById('viewersDiv').appendChild(canvas);
+					},
+					width: 300,
+					height: 300
+				});
+			}
+
+			var xyArr = [];
+			var newArr = []; //获取距离参数
+			var leng = '';
+
+			function getXY(pid, x, y, scene) {
+				newArr.push({
+					'x': x,
+					'y': y
+				})
+				xyArr.push({
+					'scene': scene,
+					'x': x,
+					'y': y
+				});
+				if(pid == 1) {
+					leng = "";
+				}
+
+				if(newArr.length == 4) {
+					var item = newArr[1];
+					newArr[1] = newArr[2];
+					newArr[2] = item;
+
+					$.ajax({
+						url: 'http://49.235.201.218:10080/cvEng/cv/ranging',
+						data: JSON.stringify({
+							"xyArr": newArr
+						}),
+						type: 'post',
+						cache: false,
+						async: false,
+						dataType: 'json',
+						contentType:   "application/json;charset-UTF-8",
+						success: function(data) {
+							leng = data+'米';
+							return leng;
+						},
+						error: function() {
+							console.log("异常！");
+						}
+					});
+					leng;
+					var newx = String(Number(x) + Number(5));
+					xyArr.push({
+						'scene': scene,
+						'txt': leng,
+						'x': newx,
+						'y': y
+					})
+
+					console.log(xyArr)
+
+					var href = window.location.href;
+					var taskId = href.split("=")[1];
+
+					var path = Url + '/smarteye/api/v1/panorama/uploadhotspot?taskId=' + taskId + ''
+					$.ajax({
+						url: path,
+						data: {
+							"hotspot": JSON.stringify(xyArr)
+						},
+						type: 'POST',
+						dataType: 'json',
+						success: function(data) {
+							console.log(data)
+						},
+						error: function(res) {
+							console.log(res);
+						}
+					})
+
+					xyArr = [];
+					newArr = [];
+
+				}
+			}
+
+			function point(point) {
+				console.log(leng)
+				var len = leng;
+				return len
+			}
+		</script>
+
+	</body>
+
+</html>
